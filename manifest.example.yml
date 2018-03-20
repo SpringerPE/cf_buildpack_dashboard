@@ -1,0 +1,13 @@
+---
+
+applications:
+  - name: cf-buildpack-dashboard
+    instances: 1
+    memory: 256MB
+    command: ./run_app.py
+    env:
+      CF_BUILDPACK_DASHBOARD_ENVIRONMENTS: '{
+        "test": "https://cf-api.test.example.com",
+        "dev": "https://cf-api.dev.example.com",
+        "live": "https://cf-api.live.example.com"
+      }'
