@@ -9,6 +9,7 @@ mocked_apps_response = '''[{
   "name": "app_name",
   "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
   "buildpack": null,
+  "buildpack_name": "ruby buildpack",
   "detected_buildpack": "Ruby",
   "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515bd",
   "space_url": "/v2/spaces/c0af44b8-8b51-4db5-927e-ccad2e6dab54",

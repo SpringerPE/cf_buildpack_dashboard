@@ -11,6 +11,7 @@ mocked_apps_json = '''[
   "name": "app1",
   "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
   "buildpack": "python_buildpack",
+  "buildpack_name": "python_buildpack",
   "detected_buildpack": "Ruby",
   "running": true,
   "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515bd",
@@ -26,6 +27,7 @@ mocked_apps_json = '''[
   "name": "app2",
   "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
   "buildpack": "ruby_buildpack",
+  "buildpack_name": "ruby_buildpack",
   "running": false,
   "detected_buildpack": "Python",
   "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515bd",
@@ -41,6 +43,7 @@ mocked_apps_json = '''[
   "name": "app3",
   "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab55",
   "buildpack": "ruby_buildpack",
+  "buildpack_name": "ruby_buildpack",
   "running": false,
   "detected_buildpack": "Python",
   "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515b5",
@@ -79,6 +82,7 @@ class TestApplicationSet(unittest.TestCase):
         self.assertEquals(app.space, "space1")
         self.assertEquals(app.org, "org1")
         self.assertEquals(app.running, True)
+        self.assertEquals(app.buildpack, "python_buildpack")
 
     def test_creating_organisation_view(self):
 
@@ -108,6 +112,7 @@ class TestApplication(unittest.TestCase):
           "name": "app1",
           "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
           "buildpack": "python_buildpack",
+          "buildpack_name": "python_buildpack",
           "detected_buildpack": "Ruby",
           "running": True,
           "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515bd",
@@ -123,7 +128,8 @@ class TestApplication(unittest.TestCase):
         self.properties_app_2 = {
           "name": "app2",
           "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
-          "buildpack": "ruby_buildpack",
+          "buildpack": None,
+          "buildpack_name": "python_buildpack",
           "running": False,
           "detected_buildpack": "Python",
           "detected_buildpack_guid": "44ec3a97-0d94-4ebb-ad33-e9ee837515bd",
@@ -149,7 +155,7 @@ class TestApplication(unittest.TestCase):
 
     def test_app_buildpack_can_be_retrieved_when_it_is_None(self):
 
-        self.properties_app_1["buildpack"] = None
+        self.properties_app_1["buildpack_name"] = None
         app = Application(**self.properties_app_1)
 
         self.assertEquals(app.buildpack, "None")

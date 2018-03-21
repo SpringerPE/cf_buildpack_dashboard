@@ -130,7 +130,7 @@ class Application(object):
         else:
             self.running = False
 
-        self._buildpack = kwargs["buildpack"]
+        self._buildpack = kwargs["buildpack_name"]
 
     @property
     def buildpack(self):
