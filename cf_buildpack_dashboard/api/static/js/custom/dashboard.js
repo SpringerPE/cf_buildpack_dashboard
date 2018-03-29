@@ -28,8 +28,10 @@ function appendAppsUl(apps, $parent){
             othersCount = 0;
 
         $.each(apps, function(appIndex, appEntry) {
+            console.log(appEntry.autodetected)
 
-            $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'}).text(appEntry.name);
+            $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'})
+                .text(appEntry.name + (appEntry.autodetected ? " (A)" : ""));
 
             if (appEntry.running) {
                 $appEntryItem.addClass('list-group-item-warning')

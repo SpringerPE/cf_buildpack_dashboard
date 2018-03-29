@@ -19,6 +19,33 @@
 
         <div class="container">
 
+            <div class="row" id="accordion-legend" >
+                <div class="col-sm-12">
+
+                    <div id="accordion">
+
+                            <button class="btn btn-info" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                              Wonder how to use this dashboard? Click here!
+                            </button>
+
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+
+                            <p>You are provided with two main views <strong>Buildpacks</strong> and <strong>Organisations</strong>.</p>
+                              <p>Each entry in the list will offer a summary of the related applications in the form of a badge:
+                              <span class="badge badge-secondary">running 2 total 3</span>. where <i>running</i> indicates the number
+                                  of running applications under the selected entry and <i>total</i> the total.</p>
+                                  <p>Some applications are marked with
+                              an <strong>(A)</strong> flag, indicating that your buildpack was autodetected (not specified in the app manifest).</p>
+                              <p>A yellow button: <button type="button" class="btn btn-warning">my application name</button> indicates a running
+                              application. A red button: <button type="button" class="btn btn-danger">my application name</button> a stopped one.
+                                  Enjoy!</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
             <div class="row">
 
                 <div class="col-sm-2 col-md-1">
