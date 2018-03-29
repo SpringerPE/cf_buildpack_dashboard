@@ -84,7 +84,11 @@ class ApplicationSet(MutableSet):
             if app.buildpack not in orgs[app.org]:
                 orgs[app.org][app.buildpack] = list()
 
-            orgs[app.org][app.buildpack].append({"name": app.name, "running": app.running})
+            orgs[app.org][app.buildpack].append({
+                "name": app.name,
+                "running": app.running,
+                "autodetected": app.has_autodetected_buildpack()
+            })
 
         if isSorted:
             return self._sort_nested_dictionary(orgs)
@@ -106,7 +110,11 @@ class ApplicationSet(MutableSet):
             if app.org not in buildpacks[app.buildpack]:
                 buildpacks[app.buildpack][app.org] = list()
 
-            buildpacks[app.buildpack][app.org].append({"name": app.name, "running": app.running})
+            buildpacks[app.buildpack][app.org].append({
+                "name": app.name,
+                "running": app.running,
+                "autodetected": app.has_autodetected_buildpack()
+            })
 
         if isSorted:
             return self._sort_nested_dictionary(buildpacks)
@@ -130,13 +138,17 @@ class Application(object):
         else:
             self.running = False
 
-        self._buildpack = kwargs["buildpack_name"]
+        self._buildpack_name = kwargs["buildpack_name"]
+        self._buildpack = kwargs["buildpack"]
 
     @property
     def buildpack(self):
-        if self._buildpack:
-            return self._buildpack
+        if self._buildpack_name:
+            return self._buildpack_name
         return "None"
+
+    def has_autodetected_buildpack(self):
+        return self._buildpack is None
 
     def __eq__(x, y):
         return x.guid == y.guid

@@ -10,7 +10,7 @@ mocked_apps_json = '''[
 {
   "name": "app1",
   "space_guid": "c0af44b8-8b51-4db5-927e-ccad2e6dab54",
-  "buildpack": "python_buildpack",
+  "buildpack": "",
   "buildpack_name": "python_buildpack",
   "detected_buildpack": "Ruby",
   "running": true,
@@ -83,6 +83,7 @@ class TestApplicationSet(unittest.TestCase):
         self.assertEquals(app.org, "org1")
         self.assertEquals(app.running, True)
         self.assertEquals(app.buildpack, "python_buildpack")
+        self.assertFalse(app.has_autodetected_buildpack())
 
     def test_creating_organisation_view(self):
 
@@ -183,4 +184,10 @@ class TestApplication(unittest.TestCase):
         self.assertTrue(app1 < app2)
         self.assertTrue(app2 > app1)
 
+    def test_buildpack_auto_detected_buildpack_property_is_set_correctly(self):
 
+        app1 = Application(**self.properties_app_1)
+        app2 = Application(**self.properties_app_2)
+
+        self.assertFalse(app1.has_autodetected_buildpack())
+        self.assertTrue(app2.has_autodetected_buildpack())
