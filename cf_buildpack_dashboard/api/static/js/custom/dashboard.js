@@ -1,3 +1,7 @@
+var $ = require('jquery');
+require('bootstrap');
+var CollapsibleLists = require('./collapsible-list.js');
+
 /**
 * Creates a new card, as in https://getbootstrap.com/docs/4.0/components/card/
 **/
@@ -15,6 +19,7 @@ function createNewCard(cardTitle, cardText){
     return $divNewCardComplete;
 }
 
+export { createNewCard };
 /**
 * Parses and appends to $parent dictionary items representing app instances
 **/
@@ -28,9 +33,8 @@ function appendAppsUl(apps, $parent){
             othersCount = 0;
 
         $.each(apps, function(appIndex, appEntry) {
-            console.log(appEntry.autodetected)
 
-            $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'})
+            var $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'})
                 .text(appEntry.name + (appEntry.autodetected ? " (A)" : ""));
 
             if (appEntry.running) {
@@ -63,13 +67,13 @@ function appendNestedUl(elements, $parent){
 
         $.each(elements, function(elementKey, values){
             //each item has an entry and a badge
-            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'})
+            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
                 $liEntryItem = $('<li>', {class: 'list-group-item list-group-item-info'})
                     .text(elementKey)
                     .append($liEntrySpan)
                     .appendTo($ul);
 
-            appsCount = appendAppsUl(values, $liEntryItem);
+            var appsCount = appendAppsUl(values, $liEntryItem);
             $liEntrySpan.text(appsCount.running + " running of " + appsCount.total + " total" );
 
             runningCount += appsCount.running;
@@ -85,22 +89,39 @@ function appendNestedUl(elements, $parent){
 **/
 function renderCollapsableList(elements, ulId) {
 
-        var $ul = $('<ul>', {id: ulId, class: 'collapsibleList list-group'});
+        var $ul = $('<ul>', {class: 'collapsibleList list-group'});
 
         $.each( elements, function( elementKey, values ) {
-            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'});
+            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
                 $liEntryItem = $('<li>', {class: 'list-group-item list-group-item-success'})
                 .text(elementKey)
                 .append($liEntrySpan)
                 .appendTo($ul);
 
-            elementsCount = appendNestedUl(values, $liEntryItem);
+            var elementsCount = appendNestedUl(values, $liEntryItem);
             $liEntrySpan.text(elementsCount.running + " running of " + elementsCount.total + " total");
 
         });
 
         return $ul;
 }
+
+var renderList = function(jsonData, divId, cardId) {
+    return new Promise(function(resolve, reject) {
+                var $topLevel_ul = renderCollapsableList(jsonData, divId);
+                resolve($topLevel_ul);
+            })
+            .then(function($topLevel_ul){
+                $("#" + cardId + " div.card-body").append($topLevel_ul);
+                return 'success';
+            })
+            .then(function(){
+                CollapsibleLists.applyTo(document.getElementById(divId, true));
+            })
+            .catch(error => { console.log('error while rendering list', error.message); })
+}
+
+export { renderList };
 
 var fetchData = function(query, dataURL) {
     // Return the $.ajax promise
@@ -125,10 +146,7 @@ function getAllData() {
         }, "/api/buildpacks");
 
     getOrganisations.done(function(jsonData){
-
-            $topLevel_ul = renderCollapsableList(jsonData, "organisations_div");
-            $("#organisations_card div.card-body").append($topLevel_ul);
-            CollapsibleLists.applyTo(document.getElementById("organisations_div", true));
+            renderList(jsonData, "organisations_div", "organisations_card");
     })
 
     getOrganisations.fail(function(jsonData){
@@ -136,10 +154,7 @@ function getAllData() {
     })
 
     getBuildpacks.done(function(jsonData){
-
-            $topLevel_ul = renderCollapsableList(jsonData, "buildpacks_div");
-            $("#buildpacks_card div.card-body").append($topLevel_ul);
-            CollapsibleLists.applyTo(document.getElementById("buildpacks_div", true));
+            renderList(jsonData, "buildpacks_div", "buildpacks_card");
     })
 
     getBuildpacks.fail(function(jsonData){
@@ -148,7 +163,7 @@ function getAllData() {
 }
 
 function getEnvironment() {
-    env = $('input[name=environments]:checked').val();
+    var env = $('input[name=environments]:checked').val();
     return env
 }
 
