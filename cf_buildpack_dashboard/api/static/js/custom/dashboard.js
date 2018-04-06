@@ -7,12 +7,12 @@ var CollapsibleLists = require('./collapsible-list.js');
 **/
 function createNewCard(cardTitle, cardText){
 
-    var $divNewCard = $('<div>', {class: 'card w-100'}),
+    let $divNewCard = $('<div>', {class: 'card w-100'}),
         $divCardBody = $('<div>', {class: 'card-body'}),
         $divCardTitle = $('<h4>', {class: 'card-title'}).append(cardTitle),
         $divCardText = $('<p>', {class: 'card-text'}).append(cardText);
 
-    var $divNewCardComplete = $divNewCard
+    let $divNewCardComplete = $divNewCard
                 .append($divCardTitle, $divCardText)
                 .append($divCardBody);
 
@@ -25,16 +25,16 @@ export { createNewCard };
 **/
 function appendAppsUl(apps, $parent){
 
-        var $running_apps = $('<ul>'),
+        let $running_apps = $('<ul>'),
             $other_apps = $('<ul>'),
             $apps_ul = $('<ul>');
 
-        var runningCount = 0,
+        let runningCount = 0,
             othersCount = 0;
 
         $.each(apps, function(appIndex, appEntry) {
 
-            var $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'})
+            let $appEntryItem = $('<li>', {class: 'list-group-item list-group-item-warning'})
                 .text(appEntry.name + (appEntry.autodetected ? " (A)" : ""));
 
             if (appEntry.running) {
@@ -60,20 +60,20 @@ function appendAppsUl(apps, $parent){
 **/
 function appendNestedUl(elements, $parent){
 
-        var $ul = $('<ul>');
+        let $ul = $('<ul>');
 
-        var runningCount = 0,
+        let runningCount = 0,
             totalCount = 0;
 
         $.each(elements, function(elementKey, values){
             //each item has an entry and a badge
-            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
+            let $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
                 $liEntryItem = $('<li>', {class: 'list-group-item list-group-item-info'})
                     .text(elementKey)
                     .append($liEntrySpan)
                     .appendTo($ul);
 
-            var appsCount = appendAppsUl(values, $liEntryItem);
+            let appsCount = appendAppsUl(values, $liEntryItem);
             $liEntrySpan.text(appsCount.running + " running of " + appsCount.total + " total" );
 
             runningCount += appsCount.running;
@@ -89,16 +89,16 @@ function appendNestedUl(elements, $parent){
 **/
 function renderCollapsableList(elements, ulId) {
 
-        var $ul = $('<ul>', {class: 'collapsibleList list-group'});
+        let $ul = $('<ul>', {class: 'collapsibleList list-group'});
 
         $.each( elements, function( elementKey, values ) {
-            var $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
+            let $liEntrySpan = $('<span>', {class: 'badge badge-default badge-pill'}),
                 $liEntryItem = $('<li>', {class: 'list-group-item list-group-item-success'})
                 .text(elementKey)
                 .append($liEntrySpan)
                 .appendTo($ul);
 
-            var elementsCount = appendNestedUl(values, $liEntryItem);
+            let elementsCount = appendNestedUl(values, $liEntryItem);
             $liEntrySpan.text(elementsCount.running + " running of " + elementsCount.total + " total");
 
         });
@@ -108,7 +108,7 @@ function renderCollapsableList(elements, ulId) {
 
 var renderList = function(jsonData, divId, cardId) {
     return new Promise(function(resolve, reject) {
-                var $topLevel_ul = renderCollapsableList(jsonData, divId);
+                let $topLevel_ul = renderCollapsableList(jsonData, divId);
                 resolve($topLevel_ul);
             })
             .then(function($topLevel_ul){
@@ -132,9 +132,11 @@ var fetchData = function(query, dataURL) {
     });
 }
 
-function getAllData() {
+function getAllData(loadingCounter) {
 
-    var getBuildpacks = fetchData(
+    loadingCounter.loading += 2;
+
+    let getBuildpacks = fetchData(
         {
             "by_buildpack": "true",
             "environment": getEnvironment()
@@ -153,6 +155,10 @@ function getAllData() {
         alert( "Request failed: " + 'Error requesting buildpack data' );
     })
 
+    getOrganisations.always(function(){
+        loadingCounter.loading--;
+    })
+
     getBuildpacks.done(function(jsonData){
             renderList(jsonData, "buildpacks_div", "buildpacks_card");
     })
@@ -160,31 +166,43 @@ function getAllData() {
     getBuildpacks.fail(function(jsonData){
         alert( "Request failed: " + 'Error requesting buildpack data' );
     })
+
+    getBuildpacks.always(function(){
+        loadingCounter.loading--;
+    })
 }
 
 function getEnvironment() {
-    var env = $('input[name=environments]:checked').val();
+    let env = $('input[name=environments]:checked').val();
     return env
 }
 
 $( document ).ready(function() {
 
-    var $buildpacksCard = createNewCard("Buildpacks", "Apps grouped by buildpack and organisation");
+    let $buildpacksCard = createNewCard("Buildpacks", "Apps grouped by buildpack and organisation");
     $buildpacksCard.attr("id", "buildpacks_card");
     $("#buildpacks_div").append($buildpacksCard);
 
-    var $organisationsCard = createNewCard("Organisations", "Apps grouped by organisation and buildpack");
+    let $organisationsCard = createNewCard("Organisations", "Apps grouped by organisation and buildpack");
     $organisationsCard.attr("id", "organisations_card");
     $("#organisations_div").append($organisationsCard);
 
-    $('input[type=radio][name=environments]').change(function() {
+    let loadingCounter = { loading:0 };
+
+    $('input[type=radio][name=environments]').change({loadingCounter: loadingCounter}, function(event) {
+
+        let loadingCounter = event.data.loadingCounter;
+
+        if (loadingCounter.loading > 0) {
+            return;
+        }
         if (!this.checked) {
             this.click();
         }
         $("#buildpacks_div .collapsibleList").remove();
         $("#organisations_div .collapsibleList").remove();
-        getAllData();
+        getAllData(loadingCounter);
     });
 
-    getAllData();
+    getAllData(loadingCounter);
 });

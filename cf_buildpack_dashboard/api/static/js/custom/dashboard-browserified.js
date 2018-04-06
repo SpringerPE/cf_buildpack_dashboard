@@ -236,7 +236,9 @@ var fetchData = function fetchData(query, dataURL) {
     });
 };
 
-function getAllData() {
+function getAllData(loadingCounter) {
+
+    loadingCounter.loading += 2;
 
     var getBuildpacks = fetchData({
         "by_buildpack": "true",
@@ -255,12 +257,20 @@ function getAllData() {
         alert("Request failed: " + 'Error requesting buildpack data');
     });
 
+    getOrganisations.always(function () {
+        loadingCounter.loading--;
+    });
+
     getBuildpacks.done(function (jsonData) {
         renderList(jsonData, "buildpacks_div", "buildpacks_card");
     });
 
     getBuildpacks.fail(function (jsonData) {
         alert("Request failed: " + 'Error requesting buildpack data');
+    });
+
+    getBuildpacks.always(function () {
+        loadingCounter.loading--;
     });
 }
 
@@ -279,16 +289,26 @@ $(document).ready(function () {
     $organisationsCard.attr("id", "organisations_card");
     $("#organisations_div").append($organisationsCard);
 
-    $('input[type=radio][name=environments]').change(function () {
+    var loadingCounter = { loading: 0 };
+
+    $('input[type=radio][name=environments]').change({ loadingCounter: loadingCounter }, function (event) {
+
+        var loadingCounter = event.data.loadingCounter;
+
+        console.log(loadingCounter.loading);
+        if (loadingCounter.loading > 0) {
+            console.log("loading...");
+            return;
+        }
         if (!this.checked) {
             this.click();
         }
         $("#buildpacks_div .collapsibleList").remove();
         $("#organisations_div .collapsibleList").remove();
-        getAllData();
+        getAllData(loadingCounter);
     });
 
-    getAllData();
+    getAllData(loadingCounter);
 });
 
 },{"./collapsible-list.js":1,"bootstrap":3,"jquery":4}],3:[function(require,module,exports){
