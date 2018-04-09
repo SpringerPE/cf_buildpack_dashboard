@@ -19,6 +19,13 @@ by env variables:
 To build the `tar.gz` pip package simply run: ```python setup.py sdist```
 from the project root directory.
 
+## Building the frontend
+
+```
+cd {PROJECT_ROOT}/api/static/js/custom
+browserify dashboard.js dashboard-browserified.js
+```
+
 ## Installing and Running
 
 ### Pip install
@@ -50,6 +57,15 @@ requirements and using the provided `run_app.py` script.
 
 ## Running the tests
 
+For the backend tests use:
+
 ```
 nosetests -s
+```
+
+For the frontend tests:
+
+```
+cd {PROJECT_ROOT}/api/static/js/custom
+npm test (or yarn test)
 ```
