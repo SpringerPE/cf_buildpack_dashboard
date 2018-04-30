@@ -1,0 +1,10 @@
+---
+
+applications:
+  - name: cf-buildpack-dashboard
+    routes:
+      - route: cf-buildpack-dashboard.dev.cf.private.springer.com
+    instances: 2
+    domain: dev.cf.private.springer.com
+    memory: 256MB
+    command: gunicorn cf_buildpack_dashboard.wsgi
