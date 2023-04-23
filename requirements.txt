@@ -3,7 +3,7 @@ cf-buildpack-dashboard==0.0.5
 chardet==3.0.4
 click==6.7
 decorator==4.2.1
-Flask==0.12.2
+Flask==1.0
 Flask-Injector==0.10.1
 gunicorn==19.7.1
 idna==2.6
